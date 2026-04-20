@@ -1,36 +1,48 @@
 import { createGlobalStyle } from 'styled-components';
-import { StyleConstants } from './StyleConstants';
-/* istanbul ignore next */
+
 export const GlobalStyle = createGlobalStyle`
-  html,
-  body {
+  html, body {
     height: 100%;
     width: 100%;
     line-height: 1.5;
   }
 
   body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    padding-top: ${StyleConstants.NAV_BAR_HEIGHT};
-    background-color: ${p => p.theme.background};
-  }
-
-  body.fontLoaded {
     font-family: 'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  }
-  
-  p,
-  label {
-    line-height: 1.5em;
+    background: #0a0a0a;
+    color: #e0e0e0;
+    margin: 0;
+    padding: 0;
+    -webkit-font-smoothing: antialiased;
   }
 
-  input, select, button {
+  * {
+    box-sizing: border-box;
+  }
+
+  input, select, button, textarea {
     font-family: inherit;
     font-size: inherit;
   }
 
-  .icon {
-    width: 1.5rem;
-    height: 1.5rem;
+  #root {
+    min-height: 100%;
+  }
+
+  ::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #111;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 4px;
+  }
+
+  ::selection {
+    background: #333;
+    color: #fff;
   }
 `;
