@@ -1,8 +1,8 @@
 package model
 
-import (
-	"strings"
-)
+// package model mendefinisikan struct Node yang merepresentasikan satu elemen
+// dalam pohon DOM hasil parsing HTML. Semua operasi string dilakukan secara
+// manual tanpa menggunakan package strings agar 100% from scratch.
 
 type Node struct {
 	ID          int               `json:"id"`
@@ -14,17 +14,29 @@ type Node struct {
 	TextContent string            `json:"textContent,omitempty"`
 }
 
+// Classes menguraikan nilai atribut "class" menjadi slice string.
+// Implementasi manual tanpa strings.Fields — split berdasarkan spasi/tab.
 func (n *Node) Classes() []string {
 	cls, ok := n.Attributes["class"]
 	if !ok || cls == "" {
 		return nil
 	}
-	parts := strings.Fields(cls)
-	result := make([]string, 0, len(parts))
-	for _, p := range parts {
-		if p != "" {
-			result = append(result, p)
+	// Split manual: kumpulkan karakter ke buffer, flush saat menemukan spasi
+	runes := []rune(cls)
+	var result []string
+	var current []rune
+	for _, ch := range runes {
+		if ch == ' ' || ch == '\t' {
+			if len(current) > 0 {
+				result = append(result, string(current))
+				current = current[:0]
+			}
+		} else {
+			current = append(current, ch)
 		}
+	}
+	if len(current) > 0 {
+		result = append(result, string(current))
 	}
 	return result
 }
@@ -42,18 +54,22 @@ func (n *Node) HasClass(class string) bool {
 	return false
 }
 
+// GetPath mengembalikan path dari root ke node ini dalam format "tag > tag > tag".
+// Diimplementasikan manual tanpa strings.Join.
 func (n *Node) GetPath() string {
-	parts := []string{}
+	var parts []string
 	current := n
 	for current != nil {
 		label := current.Tag
 		if id := current.GetID(); id != "" {
-			label += "#" + id
+			label = label + "#" + id
 		}
+		// Prepend: masukkan ke depan slice
 		parts = append([]string{label}, parts...)
 		current = current.Parent
 	}
-	return strings.Join(parts, " > ")
+	// Gabungkan manual (menggantikan strings.Join)
+	return joinStrings(parts, " > ")
 }
 
 func MaxDepth(root *Node) int {
@@ -116,6 +132,8 @@ type NodeJSON struct {
 	TextContent string            `json:"textContent,omitempty"`
 }
 
+// ToJSON mengkonversi Node ke format NodeJSON yang aman untuk di-encode ke JSON.
+// Label dibuat manual tanpa strings.Join.
 func (n *Node) ToJSON() *NodeJSON {
 	if n == nil {
 		return nil
@@ -123,10 +141,12 @@ func (n *Node) ToJSON() *NodeJSON {
 
 	label := n.Tag
 	if id := n.GetID(); id != "" {
-		label += "#" + id
+		label = label + "#" + id
 	}
 	if classes := n.Classes(); len(classes) > 0 {
-		label += "." + strings.Join(classes, ".")
+		// Gabungkan class names manual: iterasi slice lalu konkatenasi rune
+		clsJoined := joinStrings(classes, ".")
+		label = label + "." + clsJoined
 	}
 
 	result := &NodeJSON{
@@ -143,6 +163,7 @@ func (n *Node) ToJSON() *NodeJSON {
 	}
 	return result
 }
+
 
 type MatchedNodeJSON struct {
 	ID          int               `json:"id"`
@@ -199,4 +220,21 @@ func (n *Node) NextSibling() *Node {
 		}
 	}
 	return nil
+}
+
+// joinStrings menggabungkan slice string dengan separator tertentu.
+// Implementasi manual sebagai pengganti strings.Join.
+func joinStrings(parts []string, sep string) string {
+	if len(parts) == 0 {
+		return ""
+	}
+	var result []rune
+	sepRunes := []rune(sep)
+	for i, p := range parts {
+		if i > 0 {
+			result = append(result, sepRunes...)
+		}
+		result = append(result, []rune(p)...)
+	}
+	return string(result)
 }

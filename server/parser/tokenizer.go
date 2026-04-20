@@ -1,15 +1,18 @@
 package parser
 
+// TokenType mendefinisikan jenis-jenis token hasil pemecahan HTML.
+// Tokenizer ini BUKAN golang.org/x/net/html — seluruh logikanya ditulis manual
+// menggunakan iterasi rune per rune tanpa library eksternal apapun.
 type TokenType int
 
 const (
-	TokenStartTag TokenType = iota
-	TokenEndTag
-	TokenSelfClosingTag
-	TokenText
-	TokenComment
-	TokenDoctype
-	TokenEOF
+	TokenStartTag      TokenType = iota // <div>, <p>, dst.
+	TokenEndTag                         // </div>, </p>, dst.
+	TokenSelfClosingTag                 // <br/>, <img/>, dst.
+	TokenText                           // teks di antara tag
+	TokenComment                        // <!-- komentar HTML -->
+	TokenDoctype                        // <!DOCTYPE html>
+	TokenEOF                            // penanda akhir input
 )
 
 type Token struct {
@@ -19,11 +22,16 @@ type Token struct {
 	Content    string
 }
 
+// Tokenizer menyimpan state proses tokenisasi HTML secara manual.
+// Field 'input' menyimpan seluruh string HTML sebagai slice rune agar
+// iterasi per-karakter aman untuk karakter unicode.
 type Tokenizer struct {
-	input []rune
-	pos   int
+	input []rune // HTML diubah ke []rune, bukan []byte, agar aman untuk unicode
+	pos   int    // posisi pembacaan saat ini
 }
 
+// NewTokenizer membuat instance Tokenizer baru.
+// CATATAN: ini adalah struct buatan sendiri, BUKAN html.NewTokenizer dari golang.org/x/net/html.
 func NewTokenizer(input string) *Tokenizer {
 	return &Tokenizer{
 		input: []rune(input),
@@ -92,6 +100,8 @@ func toLowerString(s string) string {
 	return string(runes)
 }
 
+// voidElements adalah tag HTML yang secara alami tidak memiliki closing tag.
+// Saat ditemukan, langsung diperlakukan sebagai TokenSelfClosingTag.
 var voidElements = map[string]bool{
 	"area": true, "base": true, "br": true, "col": true,
 	"embed": true, "hr": true, "img": true, "input": true,
@@ -99,19 +109,35 @@ var voidElements = map[string]bool{
 	"track": true, "wbr": true,
 }
 
+// skipElements adalah tag yang seluruh kontennya harus diabaikan dan
+// tidak dimasukkan ke dalam DOM tree. Saat open tag ditemukan, tokenizer
+// langsung melompat (skip) semua isi hingga closing tag yang cocok.
+// Termasuk <head> karena kontennya (title, meta, link) tidak relevan
+// untuk pencocokan CSS selector pada elemen body.
 var skipElements = map[string]bool{
-	"script": true, "style": true, "noscript": true,
+	"script":   true,
+	"style":    true,
+	"noscript": true,
+	"head":     true, // konten <head> diabaikan sesuai spesifikasi tugas
 }
 
+// Tokenize adalah fungsi utama tokenizer.
+// Algoritma: baca karakter satu per satu.
+//   - Jika karakter saat ini '<' -> baca satu token tag lengkap.
+//   - Jika bukan '<'             -> baca teks biasa hingga '<' berikutnya.
+// Komentar HTML dan DOCTYPE dibuang (tidak dimasukkan ke slice hasil).
+// Elemen dalam skipElements (script, style, head, noscript) dilewati seluruh isinya.
 func (t *Tokenizer) Tokenize() []Token {
 	var tokens []Token
 	for !t.eof() {
 		if t.peek() == '<' {
 			token := t.readTag()
+			// Komentar dan DOCTYPE tidak perlu masuk ke tree, langsung buang
 			if token.Type != TokenComment && token.Type != TokenDoctype {
 				tokens = append(tokens, token)
 			}
-
+			// Jika ini tag pembuka dari elemen yang harus di-skip,
+			// loncat seluruh kontennya hingga closing tag ditemukan
 			if token.Type == TokenStartTag && skipElements[token.TagName] {
 				t.skipUntilClosingTag(token.TagName)
 			}
@@ -230,18 +256,25 @@ func (t *Tokenizer) readTagName() string {
 	return string(name)
 }
 
+// readAttributes membaca semua atribut dari sebuah tag HTML.
+// Format yang didukung:
+//   key="value"   -> nilai dengan kutip ganda
+//   key='value'   -> nilai dengan kutip tunggal
+//   key=value     -> nilai tanpa kutip
+//   key           -> atribut boolean (nilai string kosong)
 func (t *Tokenizer) readAttributes() map[string]string {
 	attrs := make(map[string]string)
 
 	for {
 		t.skipWhitespace()
+		// Berhenti jika sudah sampai akhir tag
 		if t.eof() || t.peek() == '>' || t.peek() == '/' {
 			break
 		}
 
 		attrName := t.readAttrName()
 		if attrName == "" {
-			t.next()
+			t.next() // skip karakter tidak dikenal
 			continue
 		}
 		attrName = toLowerString(attrName)
@@ -249,11 +282,12 @@ func (t *Tokenizer) readAttributes() map[string]string {
 		t.skipWhitespace()
 
 		if t.peek() == '=' {
-			t.next()
+			t.next() // konsumsi '='
 			t.skipWhitespace()
 			attrValue := t.readAttrValue()
 			attrs[attrName] = attrValue
 		} else {
+			// Atribut boolean seperti <input disabled> atau <video autoplay>
 			attrs[attrName] = ""
 		}
 	}
@@ -316,18 +350,23 @@ func (t *Tokenizer) readDoctype() Token {
 	return Token{Type: TokenDoctype}
 }
 
+// skipUntilClosingTag melompati semua karakter mulai dari posisi saat ini
+// hingga menemukan closing tag yang cocok, misal </script> atau </head>.
+// Digunakan bersama skipElements untuk mengabaikan konten yang tidak relevan.
 func (t *Tokenizer) skipUntilClosingTag(tagName string) {
 	target := "</" + tagName
 	for !t.eof() {
 		if t.peek() == '<' {
+			// Bandingkan slice input di posisi saat ini dengan target closing tag
 			remaining := string(t.input[t.pos:])
 			if len(remaining) >= len(target) && toLowerString(remaining[:len(target)]) == target {
-				t.pos += len(target)
+				t.pos += len(target) // loncat melewati "</tagname"
+				// Lanjut sampai '>' penutup closing tag
 				for !t.eof() && t.peek() != '>' {
 					t.next()
 				}
 				if !t.eof() {
-					t.next()
+					t.next() // konsumsi '>'
 				}
 				return
 			}
