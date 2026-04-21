@@ -22,39 +22,42 @@ export function CustomNode({
   const textContent = nodeDatum.__textContent || '';
   const isTextNode = tag === '#text';
 
-  let fillColor = '#1a1a1a';
-  let strokeColor = '#444';
-  let textColor = '#ccc';
+  const fillColor = '#000';
+  let strokeColor = '#fff';
+  let textColor = '#fff';
   let strokeWidth = 1.5;
+  let nodeOpacity = 1;
+  let glowOpacity = 0;
 
   if (isCurrent) {
-    fillColor = '#333';
-    strokeColor = '#fff';
-    textColor = '#fff';
     strokeWidth = 2.5;
+    glowOpacity = 0.35;
+    nodeOpacity = 1;
   } else if (isMatched) {
-    fillColor = '#2a2a2a';
-    strokeColor = '#fff';
-    textColor = '#fff';
     strokeWidth = 2;
+    glowOpacity = 0.2;
+    nodeOpacity = 1;
   } else if (isLCAPath) {
-    fillColor = '#222';
-    strokeColor = '#bbb';
-    textColor = '#ddd';
     strokeWidth = 2;
+    nodeOpacity = 0.9;
   } else if (isVisited) {
-    fillColor = '#222';
-    strokeColor = '#888';
-    textColor = '#aaa';
     strokeWidth = 1.5;
+    nodeOpacity = 0.75;
+  } else {
+    strokeColor = '#555';
+    strokeWidth = 1;
+    nodeOpacity = 0.45;
   }
 
   let displayText = tag;
   if (isTextNode) {
     displayText =
-      textContent.length > 20
-        ? textContent.substring(0, 20) + '...'
+      textContent.length > 24
+        ? textContent.substring(0, 24) + '…'
         : textContent;
+  } else {
+    displayText =
+      tag.length > 16 ? tag.substring(0, 14) + '…' : tag;
   }
 
   const htmlId = nodeDatum.attributes?.id || '';
@@ -67,22 +70,22 @@ export function CustomNode({
   }
   if (subtitle.length > 22) subtitle = subtitle.substring(0, 22) + '...';
 
-  const nodeWidth = 140;
-  const nodeHeight = subtitle ? 44 : 34;
+  const nodeWidth = 160;
+  const nodeHeight = subtitle ? 48 : 38;
 
   return (
-    <g onClick={onClick} style={{ cursor: 'pointer' }}>
-      {isCurrent && (
+    <g onClick={onClick} style={{ cursor: 'pointer', opacity: nodeOpacity }}>
+      {glowOpacity > 0 && (
         <rect
-          x={-nodeWidth / 2 - 2}
-          y={-nodeHeight / 2 - 2}
-          width={nodeWidth + 4}
-          height={nodeHeight + 4}
-          rx={8}
+          x={-nodeWidth / 2 - 4}
+          y={-nodeHeight / 2 - 4}
+          width={nodeWidth + 8}
+          height={nodeHeight + 8}
+          rx={10}
           fill="none"
-          stroke="#fff"
-          strokeWidth={1}
-          opacity={0.4}
+          stroke="#ffffff"
+          strokeWidth={1.5}
+          opacity={glowOpacity}
         />
       )}
 
@@ -99,39 +102,41 @@ export function CustomNode({
 
       <text
         fill={textColor}
-        fontSize={isTextNode ? 10 : 12}
-        fontWeight={600}
+        style={{ fill: textColor }}
+        fontSize={isTextNode ? 11 : 13}
+        fontWeight={700}
         fontFamily="'JetBrains Mono', 'Courier New', monospace"
         textAnchor="middle"
-        dy={subtitle ? '-0.15em' : '0.35em'}
+        dy={subtitle ? '-0.2em' : '0.35em'}
       >
         {isTextNode ? `"${displayText}"` : `<${displayText}>`}
       </text>
 
       {subtitle && !isTextNode && (
         <text
-          fill={isVisited || isMatched || isCurrent ? '#999' : '#666'}
-          fontSize={9}
+          fill="#888"
+          fontSize={10}
           fontFamily="'JetBrains Mono', monospace"
           textAnchor="middle"
-          dy="1.3em"
+          dy="1.4em"
         >
           {subtitle}
         </text>
       )}
 
       <circle
-        cx={nodeWidth / 2 - 2}
-        cy={-nodeHeight / 2 + 2}
-        r={8}
-        fill="#0a0a0a"
+        cx={nodeWidth / 2 - 3}
+        cy={-nodeHeight / 2 + 3}
+        r={9}
+        fill={fillColor}
         stroke={strokeColor}
         strokeWidth={1}
       />
       <text
-        x={nodeWidth / 2 - 2}
-        y={-nodeHeight / 2 + 2}
-        fill="#888"
+        x={nodeWidth / 2 - 3}
+        y={-nodeHeight / 2 + 3}
+        fill={textColor}
+        style={{ fill: textColor }}
         fontSize={7}
         fontWeight={700}
         textAnchor="middle"

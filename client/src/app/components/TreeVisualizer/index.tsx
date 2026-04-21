@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback, useRef, useState, useEffect } from 'react';
 import Tree from 'react-d3-tree';
 import styled from 'styled-components/macro';
 import { TreeNode } from 'types/tree';
@@ -49,6 +49,22 @@ export function TreeVisualizer({
     return convertToD3Tree(tree);
   }, [tree]);
 
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const [translate, setTranslate] = useState({ x: 400, y: 50 });
+
+  useEffect(() => {
+    const updateTranslate = () => {
+      if (wrapperRef.current) {
+        const { width } = wrapperRef.current.getBoundingClientRect();
+        setTranslate({ x: width / 2, y: 50 });
+      }
+    };
+    updateTranslate();
+    const ro = new ResizeObserver(updateTranslate);
+    if (wrapperRef.current) ro.observe(wrapperRef.current);
+    return () => ro.disconnect();
+  }, []);
+
   const renderCustomNode = useCallback(
     ({ nodeDatum, toggleNode }: any) => {
       const nodeId = nodeDatum.__nodeId as number;
@@ -88,18 +104,20 @@ export function TreeVisualizer({
           Max Depth: <b>{maxDepth}</b>
         </Stat>
         <Legend>
-          <LegendItem border="#888">Visited</LegendItem>
-          <LegendItem border="#fff">Matched</LegendItem>
+          <LegendItem color="#444">Default</LegendItem>
+          <LegendItem color="#fff">Visited</LegendItem>
+          <LegendItem color="#fff">Matched</LegendItem>
+          <LegendItem color="#fff">Current</LegendItem>
         </Legend>
       </StatsBar>
-      <TreeWrapper>
+      <TreeWrapper ref={wrapperRef}>
         <Tree
           data={d3Tree}
           orientation="vertical"
           pathFunc="step"
-          translate={{ x: 400, y: 50 }}
-          separation={{ siblings: 1.5, nonSiblings: 2 }}
-          nodeSize={{ x: 180, y: 90 }}
+          translate={translate}
+          separation={{ siblings: 1.8, nonSiblings: 2.2 }}
+          nodeSize={{ x: 200, y: 100 }}
           renderCustomNodeElement={renderCustomNode}
           collapsible={true}
           zoomable={true}
@@ -145,20 +163,20 @@ const Legend = styled.div`
   margin-left: auto;
 `;
 
-const LegendItem = styled.span<{ border: string }>`
+const LegendItem = styled.span<{ color: string }>`
   display: flex;
   align-items: center;
   gap: 5px;
   font-size: 0.72rem;
-  color: #888;
+  color: ${p => p.color};
 
   &::before {
     content: '';
     width: 10px;
     height: 10px;
     border-radius: 2px;
-    border: 1.5px solid ${p => p.border};
-    background: transparent;
+    border: 1.5px solid ${p => p.color};
+    background: ${p => p.color}22;
   }
 `;
 
@@ -169,8 +187,17 @@ const TreeWrapper = styled.div`
 
   .rd3t-link,
   .tree-link {
-    stroke: #333 !important;
+    stroke: #fff !important;
     stroke-width: 1px !important;
+    opacity: 0.35;
+  }
+
+  /* Override react-d3-tree default black text */
+  svg text,
+  .rd3t-label__title,
+  .rd3t-label__attributes,
+  g text {
+    fill: #fff !important;
   }
 `;
 

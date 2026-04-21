@@ -192,8 +192,8 @@ const LeftPanel = styled.div`
 
 const RightPanel = styled.div`
   position: sticky;
-  top: 76px;
-  height: calc(100vh - 96px);
+  top: 66px;
+  height: calc(100vh - 86px);
 `;
 
 const Card = styled.div`
