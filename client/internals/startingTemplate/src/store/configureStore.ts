@@ -1,7 +1,3 @@
-/**
- * Create the store with dynamic reducers
- */
-
 import {
   configureStore,
   getDefaultMiddleware,
@@ -17,7 +13,6 @@ export function configureAppStore() {
   const sagaMiddleware = createSagaMiddleware(reduxSagaMonitorOptions);
   const { run: runSaga } = sagaMiddleware;
 
-  // Create the store with saga middleware
   const middlewares = [sagaMiddleware];
 
   const enhancers = [

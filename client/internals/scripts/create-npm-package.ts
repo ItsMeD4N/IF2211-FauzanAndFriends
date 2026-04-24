@@ -15,7 +15,6 @@ export function createNpmPackage(opts: Options = {}) {
 
   createTemplateFolder(opts);
 
-  // Create a tarball archive and get filename of generated archive from stdout
   const archiveFilename = shell
     .exec(`npm pack`, { silent: true })
     .stdout.trim();
@@ -26,7 +25,6 @@ export function createNpmPackage(opts: Options = {}) {
 
   removeTemplateFolder();
 
-  // Rename the files that NPM has special conditions back
   shell.mv(
     `${packageFolder}/template/npmrc`,
     `${packageFolder}/template/.npmrc`,

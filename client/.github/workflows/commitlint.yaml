@@ -2,11 +2,11 @@
 name: commitlint
 on:
   pull_request:
-      types: ['opened', 'edited', 'reopened', 'synchronize']
+    types: ['opened', 'edited', 'reopened', 'synchronize']
   push:
-      branches:
-        - master
-        - dev
+    branches:
+      - master
+      - dev
 
 jobs:
   lint-pull-request-name:

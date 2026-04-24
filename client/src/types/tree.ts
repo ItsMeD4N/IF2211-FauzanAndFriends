@@ -64,7 +64,12 @@ export interface ErrorResponse {
 export type SourceType = 'url' | 'raw';
 export type AlgorithmType = 'bfs' | 'dfs';
 export type LimitType = 'all' | 'topn';
-export type NodeState = 'idle' | 'visiting' | 'visited' | 'matched' | 'lca-path';
+export type NodeState =
+  | 'idle'
+  | 'visiting'
+  | 'visited'
+  | 'matched'
+  | 'lca-path';
 
 export interface SearchFormData {
   source: SourceType;
@@ -80,6 +85,6 @@ export interface SearchFormData {
 export interface AnimationState {
   isPlaying: boolean;
   currentStep: number;
-  speed: number; // multiplier
+  speed: number;
   totalSteps: number;
 }

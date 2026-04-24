@@ -126,9 +126,7 @@ export function HomePage() {
       setResult(res);
 
       const maxStep =
-        res.log && res.log.length > 0
-          ? res.log[res.log.length - 1].step
-          : 0;
+        res.log && res.log.length > 0 ? res.log[res.log.length - 1].step : 0;
 
       setAnimation(prev => ({
         ...prev,
@@ -371,12 +369,18 @@ const LeftPanel = styled.div`
   overflow-y: auto;
   padding-right: 4px;
 
-  /* Thin scrollbar */
   scrollbar-width: thin;
   scrollbar-color: #333 transparent;
-  &::-webkit-scrollbar { width: 4px; }
-  &::-webkit-scrollbar-track { background: transparent; }
-  &::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 4px;
+  }
 `;
 
 const RightPanel = styled.div`

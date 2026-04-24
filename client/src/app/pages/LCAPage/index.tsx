@@ -51,7 +51,13 @@ export function LCAPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await findLCA(source, url, html, selectedNodes[0], selectedNodes[1]);
+      const res = await findLCA(
+        source,
+        url,
+        html,
+        selectedNodes[0],
+        selectedNodes[1],
+      );
       setLcaResult(res);
       setLcaPathIds(new Set([...res.pathFromNode1, ...res.pathFromNode2]));
     } catch (err: any) {
@@ -65,7 +71,10 @@ export function LCAPage() {
     <>
       <Helmet>
         <title>LCA Binary Lifting</title>
-        <meta name="description" content="Lowest Common Ancestor pada DOM Tree" />
+        <meta
+          name="description"
+          content="Lowest Common Ancestor pada DOM Tree"
+        />
       </Helmet>
 
       <PageContainer>
@@ -77,19 +86,37 @@ export function LCAPage() {
               <CardTitle>Input HTML</CardTitle>
               <RadioGroup>
                 <RadioLabel active={source === 'raw'}>
-                  <input type="radio" hidden checked={source === 'raw'} onChange={() => setSource('raw')} />
+                  <input
+                    type="radio"
+                    hidden
+                    checked={source === 'raw'}
+                    onChange={() => setSource('raw')}
+                  />
                   Raw HTML
                 </RadioLabel>
                 <RadioLabel active={source === 'url'}>
-                  <input type="radio" hidden checked={source === 'url'} onChange={() => setSource('url')} />
+                  <input
+                    type="radio"
+                    hidden
+                    checked={source === 'url'}
+                    onChange={() => setSource('url')}
+                  />
                   URL
                 </RadioLabel>
               </RadioGroup>
 
               {source === 'url' ? (
-                <Input placeholder="https://example.com" value={url} onChange={e => setUrl(e.target.value)} />
+                <Input
+                  placeholder="https://example.com"
+                  value={url}
+                  onChange={e => setUrl(e.target.value)}
+                />
               ) : (
-                <TextArea value={html} onChange={e => setHtml(e.target.value)} rows={4} />
+                <TextArea
+                  value={html}
+                  onChange={e => setHtml(e.target.value)}
+                  rows={4}
+                />
               )}
 
               <ActionBtn onClick={handleParse} disabled={loading}>
@@ -106,10 +133,16 @@ export function LCAPage() {
                     <SelectedBadge key={id}>ID: {id}</SelectedBadge>
                   ))}
                   {selectedNodes.length < 2 && (
-                    <span style={{ color: '#555' }}> ({2 - selectedNodes.length} lagi)</span>
+                    <span style={{ color: '#555' }}>
+                      {' '}
+                      ({2 - selectedNodes.length} lagi)
+                    </span>
                   )}
                 </InfoText>
-                <ActionBtn onClick={handleFindLCA} disabled={selectedNodes.length !== 2 || loading}>
+                <ActionBtn
+                  onClick={handleFindLCA}
+                  disabled={selectedNodes.length !== 2 || loading}
+                >
                   Cari LCA
                 </ActionBtn>
               </Card>
@@ -121,7 +154,9 @@ export function LCAPage() {
                 <ResultGrid>
                   <ResultRow>
                     <ResultLabel>LCA Node</ResultLabel>
-                    <ResultValue>&lt;{lcaResult.lcaTag}&gt; (ID: {lcaResult.lcaNodeId})</ResultValue>
+                    <ResultValue>
+                      &lt;{lcaResult.lcaTag}&gt; (ID: {lcaResult.lcaNodeId})
+                    </ResultValue>
                   </ResultRow>
                   <ResultRow>
                     <ResultLabel>Depth</ResultLabel>
@@ -129,11 +164,15 @@ export function LCAPage() {
                   </ResultRow>
                   <ResultRow>
                     <ResultLabel>Path dari Node 1</ResultLabel>
-                    <ResultValue>{lcaResult.pathFromNode1.join(' > ')}</ResultValue>
+                    <ResultValue>
+                      {lcaResult.pathFromNode1.join(' > ')}
+                    </ResultValue>
                   </ResultRow>
                   <ResultRow>
                     <ResultLabel>Path dari Node 2</ResultLabel>
-                    <ResultValue>{lcaResult.pathFromNode2.join(' > ')}</ResultValue>
+                    <ResultValue>
+                      {lcaResult.pathFromNode2.join(' > ')}
+                    </ResultValue>
                   </ResultRow>
                 </ResultGrid>
               </Card>
@@ -144,7 +183,9 @@ export function LCAPage() {
             <TreeVisualizer
               tree={tree}
               visitedNodeIds={new Set(selectedNodes)}
-              matchedNodeIds={lcaResult ? new Set([lcaResult.lcaNodeId]) : new Set()}
+              matchedNodeIds={
+                lcaResult ? new Set([lcaResult.lcaNodeId]) : new Set()
+              }
               currentVisitId={null}
               lcaPathIds={lcaPathIds}
               maxDepth={maxDepth}
@@ -239,7 +280,9 @@ const Input = styled.input`
   color: #fff;
   padding: 10px 12px;
   outline: none;
-  &:focus { border-color: #888; }
+  &:focus {
+    border-color: #888;
+  }
 `;
 
 const TextArea = styled.textarea`
@@ -252,7 +295,9 @@ const TextArea = styled.textarea`
   font-size: 0.82rem;
   resize: vertical;
   outline: none;
-  &:focus { border-color: #888; }
+  &:focus {
+    border-color: #888;
+  }
 `;
 
 const ActionBtn = styled.button`
@@ -265,8 +310,13 @@ const ActionBtn = styled.button`
   cursor: pointer;
   transition: background 0.15s;
 
-  &:hover:not(:disabled) { background: #ddd; }
-  &:disabled { opacity: 0.4; cursor: not-allowed; }
+  &:hover:not(:disabled) {
+    background: #ddd;
+  }
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
 `;
 
 const InfoText = styled.div`

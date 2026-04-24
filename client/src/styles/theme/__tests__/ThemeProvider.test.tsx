@@ -33,7 +33,6 @@ describe('<ThemeProvider />', () => {
   it('should render selected theme', () => {
     let theme: any;
     const children = () => {
-      // eslint-disable-next-line react-hooks/rules-of-hooks
       theme = useTheme();
       return <h1>a</h1>;
     };

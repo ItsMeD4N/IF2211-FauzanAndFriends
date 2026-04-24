@@ -8,8 +8,6 @@ import {
   RootStateKeyType,
 } from './types/injector-typings';
 
-/* Wrap redux-injectors with stricter types */
-
 export function useInjectReducer<Key extends RootStateKeyType>(
   params: InjectReducerParams<Key>,
 ) {

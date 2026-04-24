@@ -1,4 +1,10 @@
-import React, { useMemo, useCallback, useRef, useState, useEffect } from 'react';
+import React, {
+  useMemo,
+  useCallback,
+  useRef,
+  useState,
+  useEffect,
+} from 'react';
 import Tree from 'react-d3-tree';
 import styled from 'styled-components/macro';
 import { TreeNode } from 'types/tree';
@@ -14,20 +20,16 @@ interface TreeVisualizerProps {
   totalNodes: number;
   onNodeClick?: (nodeId: number) => void;
 }
-                 
+
 function convertToD3Tree(node: TreeNode): any {
   return {
-    name: node.name || node.tag,
-    attributes: {
-      id: String(node.id),
-      tag: node.tag,
-      depth: String(node.depth),
-      ...(node.attributes || {}),
-    },
+    name: '',
+    attributes: {},
     __nodeId: node.id,
     __tag: node.tag,
     __depth: node.depth,
     __textContent: node.textContent || '',
+    __htmlAttributes: node.attributes || {},
     children: node.children
       ? node.children.map(child => convertToD3Tree(child))
       : undefined,
@@ -89,13 +91,15 @@ export function TreeVisualizer({
     return (
       <EmptyState>
         <EmptyTitle>Belum ada data</EmptyTitle>
-        <EmptyText>Masukkan HTML dan jalankan traversal untuk melihat pohon DOM</EmptyText>
+        <EmptyText>
+          Masukkan HTML dan jalankan traversal untuk melihat pohon DOM
+        </EmptyText>
       </EmptyState>
     );
   }
 
   return (
-    <Container>
+    <Container id="dom-tree-viz">
       <StatsBar>
         <Stat>
           Total: <b>{totalNodes}</b> node
@@ -104,10 +108,11 @@ export function TreeVisualizer({
           Max Depth: <b>{maxDepth}</b>
         </Stat>
         <Legend>
-          <LegendItem color="#444">Default</LegendItem>
-          <LegendItem color="#fff">Visited</LegendItem>
-          <LegendItem color="#fff">Matched</LegendItem>
-          <LegendItem color="#fff">Current</LegendItem>
+          <LegendItem color="#aaaaaa">Default</LegendItem>
+          <LegendItem color="#3b82f6">Visited</LegendItem>
+          <LegendItem color="#22c55e">Matched</LegendItem>
+          <LegendItem color="#f59e0b">LCA Path</LegendItem>
+          <LegendItem color="#a855f7">Current</LegendItem>
         </Legend>
       </StatsBar>
       <TreeWrapper ref={wrapperRef}>
@@ -116,8 +121,8 @@ export function TreeVisualizer({
           orientation="vertical"
           pathFunc="step"
           translate={translate}
-          separation={{ siblings: 1.8, nonSiblings: 2.2 }}
-          nodeSize={{ x: 200, y: 100 }}
+          separation={{ siblings: 1.5, nonSiblings: 2 }}
+          nodeSize={{ x: 180, y: 90 }}
           renderCustomNodeElement={renderCustomNode}
           collapsible={true}
           zoomable={true}
@@ -187,17 +192,9 @@ const TreeWrapper = styled.div`
 
   .rd3t-link,
   .tree-link {
-    stroke: #fff !important;
+    stroke: #333 !important;
     stroke-width: 1px !important;
-    opacity: 0.35;
-  }
-
-  /* Override react-d3-tree default black text */
-  svg text,
-  .rd3t-label__title,
-  .rd3t-label__attributes,
-  g text {
-    fill: #fff !important;
+    opacity: 0.7;
   }
 `;
 
