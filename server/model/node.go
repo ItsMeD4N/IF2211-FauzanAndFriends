@@ -1,9 +1,5 @@
 package model
 
-// package model mendefinisikan struct Node yang merepresentasikan satu elemen
-// dalam pohon DOM hasil parsing HTML. Semua operasi string dilakukan secara
-// manual tanpa menggunakan package strings agar 100% from scratch.
-
 type Node struct {
 	ID          int               `json:"id"`
 	Tag         string            `json:"tag"`
@@ -14,14 +10,11 @@ type Node struct {
 	TextContent string            `json:"textContent,omitempty"`
 }
 
-// Classes menguraikan nilai atribut "class" menjadi slice string.
-// Implementasi manual tanpa strings.Fields — split berdasarkan spasi/tab.
 func (n *Node) Classes() []string {
 	cls, ok := n.Attributes["class"]
 	if !ok || cls == "" {
 		return nil
 	}
-	// Split manual: kumpulkan karakter ke buffer, flush saat menemukan spasi
 	runes := []rune(cls)
 	var result []string
 	var current []rune
@@ -54,8 +47,6 @@ func (n *Node) HasClass(class string) bool {
 	return false
 }
 
-// GetPath mengembalikan path dari root ke node ini dalam format "tag > tag > tag".
-// Diimplementasikan manual tanpa strings.Join.
 func (n *Node) GetPath() string {
 	var parts []string
 	current := n
@@ -64,11 +55,9 @@ func (n *Node) GetPath() string {
 		if id := current.GetID(); id != "" {
 			label = label + "#" + id
 		}
-		// Prepend: masukkan ke depan slice
 		parts = append([]string{label}, parts...)
 		current = current.Parent
 	}
-	// Gabungkan manual (menggantikan strings.Join)
 	return joinStrings(parts, " > ")
 }
 
@@ -132,8 +121,6 @@ type NodeJSON struct {
 	TextContent string            `json:"textContent,omitempty"`
 }
 
-// ToJSON mengkonversi Node ke format NodeJSON yang aman untuk di-encode ke JSON.
-// Label dibuat manual tanpa strings.Join.
 func (n *Node) ToJSON() *NodeJSON {
 	if n == nil {
 		return nil
@@ -144,7 +131,6 @@ func (n *Node) ToJSON() *NodeJSON {
 		label = label + "#" + id
 	}
 	if classes := n.Classes(); len(classes) > 0 {
-		// Gabungkan class names manual: iterasi slice lalu konkatenasi rune
 		clsJoined := joinStrings(classes, ".")
 		label = label + "." + clsJoined
 	}
@@ -163,7 +149,6 @@ func (n *Node) ToJSON() *NodeJSON {
 	}
 	return result
 }
-
 
 type MatchedNodeJSON struct {
 	ID          int               `json:"id"`
@@ -222,8 +207,6 @@ func (n *Node) NextSibling() *Node {
 	return nil
 }
 
-// joinStrings menggabungkan slice string dengan separator tertentu.
-// Implementasi manual sebagai pengganti strings.Join.
 func joinStrings(parts []string, sep string) string {
 	if len(parts) == 0 {
 		return ""
