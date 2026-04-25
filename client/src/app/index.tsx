@@ -18,7 +18,7 @@ function NavBar() {
   return (
     <Nav>
       <NavInner>
-        <NavBrand to="/">DOM Explorer</NavBrand>
+        <NavBrand to="/">DOM</NavBrand>
         <NavLinks>
           <NavLink to="/" active={location.pathname === '/'}>
             Traversal
@@ -36,7 +36,7 @@ export function App() {
   return (
     <BrowserRouter>
       <Helmet
-        titleTemplate="%s - DOM Tree Explorer"
+        titleTemplate="DOM Tree Explorer"
         defaultTitle="DOM Tree Explorer"
       >
         <meta
