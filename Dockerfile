@@ -9,7 +9,7 @@ COPY client .
 RUN npm run build
 
 # Stage 2: Build Go backend
-FROM golang:1.22-alpine AS server-builder
+FROM golang:1.26-alpine AS server-builder
 WORKDIR /app/server
 COPY server/go.mod ./
 RUN go mod download
