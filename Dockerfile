@@ -7,7 +7,7 @@ RUN npm run build
 
 FROM golang:1.22-alpine AS server-builder
 WORKDIR /app/server
-COPY server/go.mod server/go.sum ./
+COPY server/go.mod ./
 RUN go mod download
 COPY server .
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o app main.go
