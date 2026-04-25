@@ -1,4 +1,5 @@
 # Multi-stage build for DOM Tree Explorer
+# Hardcoded for Azure VM: 57.158.24.156
 
 # Stage 1: Build React frontend
 FROM node:20-alpine AS client-builder

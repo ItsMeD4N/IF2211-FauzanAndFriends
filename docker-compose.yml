@@ -1,7 +1,6 @@
 version: "3.9"
 
 services:
-  # Production: single container with built frontend + Go API
   app:
     build: .
     container_name: stima_app
@@ -10,33 +9,3 @@ services:
     environment:
       - APP_PORT=8080
     restart: unless-stopped
-
-  # Development: separate services
-  # Uncomment below for development mode
-
-  # server:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile.server
-  #   container_name: stima_server
-  #   working_dir: /app
-  #   volumes:
-  #     - ./server:/app
-  #   ports:
-  #     - "8080:8080"
-  #   environment:
-  #     - APP_PORT=8080
-  #   command: go run main.go
-
-  # client:
-  #   image: node:20-alpine
-  #   container_name: stima_client
-  #   working_dir: /app
-  #   volumes:
-  #     - ./client:/app
-  #     - /app/node_modules
-  #   ports:
-  #     - "3000:3000"
-  #   environment:
-  #     - REACT_APP_API_URL=http://localhost:8080
-  #   command: npm start

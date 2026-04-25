@@ -1,0 +1,43 @@
+# Dependencies
+client/node_modules
+server/vendor
+
+# Build outputs (will be rebuilt inside Docker)
+client/build
+
+# Git
+.git
+.gitignore
+
+# IDE
+.vscode
+.idea
+
+# Docs
+*.md
+!README.md
+docs/
+LICENSE
+
+# Misc
+.husky
+.github
+.editorconfig
+.prettierrc
+.prettierignore
+.stylelintrc
+.eslintrc.js
+commitlint.config.js
+.all-contributorsrc
+.babel-plugin-macrosrc.js
+.gitattributes
+.gitbook.yaml
+.nvmrc
+.npmrc
+.versionrc.js
+CHANGELOG.md
+CODE_OF_CONDUCT.md
+CONTRIBUTING.md
+RELEASE_PROCESS.md
+template.json
+yarn.lock
