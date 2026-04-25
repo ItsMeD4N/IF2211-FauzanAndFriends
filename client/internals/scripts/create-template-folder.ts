@@ -35,12 +35,10 @@ export function createTemplateFolder(opts: Options = {}) {
     }
   };
 
-  // Clean already generated one
   shell.rm('-rf', 'template');
 
   shell.mkdir('template');
 
-  // We want only pre-commit hook with custom script excluded
   shell.mkdir('template/.husky');
   copyToTemplate('.husky/pre-commit', false, {
     from: /yarn verify-startingTemplate-changes/g,
@@ -77,7 +75,6 @@ export function createTemplateFolder(opts: Options = {}) {
   copyToTemplate('tsconfig.json');
   copyToTemplate('README.md');
 
-  // Rename some specific files so they won't be discarded in 'yarn pack'
   shell.mv('template/.gitignore', 'template/gitignore');
   shell.mv('template/.npmrc', 'template/npmrc');
 

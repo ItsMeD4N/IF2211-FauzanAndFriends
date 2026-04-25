@@ -94,7 +94,7 @@ const NavLinks = styled.div`
   gap: 4px;
 `;
 
-const NavLink = styled(Link)<{ active: boolean }>`
+const NavLink = styled(Link) <{ active: boolean }>`
   padding: 8px 16px;
   border-radius: 4px;
   font-size: 0.85rem;

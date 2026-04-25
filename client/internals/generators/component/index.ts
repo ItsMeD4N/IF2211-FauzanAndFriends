@@ -1,7 +1,3 @@
-/**
- * Component Generator
- */
-
 import { Actions, PlopGeneratorConfig } from 'node-plop';
 import inquirer from 'inquirer';
 

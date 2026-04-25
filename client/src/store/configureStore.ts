@@ -9,7 +9,6 @@ export function configureAppStore() {
   const sagaMiddleware = createSagaMiddleware(reduxSagaMonitorOptions);
   const { run: runSaga } = sagaMiddleware;
 
-  // Create the store with saga middleware
   const middlewares = [sagaMiddleware];
 
   const enhancers = [
@@ -23,9 +22,8 @@ export function configureAppStore() {
     reducer: createReducer(),
     middleware: defaultMiddleware => [...defaultMiddleware(), ...middlewares],
     devTools:
-      /* istanbul ignore next line */
       process.env.NODE_ENV !== 'production' ||
-      process.env.PUBLIC_URL.length > 0,
+      (process.env.PUBLIC_URL?.length ?? 0) > 0,
     enhancers,
   });
 

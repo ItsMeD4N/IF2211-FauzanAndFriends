@@ -131,15 +131,20 @@ const MetricCard = styled.div`
   background: #1a1a1a;
   border: 1px solid #2a2a2a;
   border-radius: 6px;
-  padding: 12px;
+  padding: 10px 8px;
   text-align: center;
+  min-width: 0;
+  overflow: hidden;
 `;
 
 const MetricValue = styled.div`
-  font-size: 1.2rem;
+  font-size: 1rem;
   font-weight: 800;
   color: #fff;
   font-family: 'JetBrains Mono', monospace;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 const MetricLabel = styled.div`

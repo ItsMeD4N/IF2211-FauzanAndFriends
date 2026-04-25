@@ -18,128 +18,66 @@ export function CustomNode({
   onClick,
 }: CustomNodeProps) {
   const tag = nodeDatum.__tag || nodeDatum.name;
-  const nodeId = nodeDatum.__nodeId;
   const textContent = nodeDatum.__textContent || '';
   const isTextNode = tag === '#text';
-
-  let fillColor = '#1a1a1a';
-  let strokeColor = '#444';
-  let textColor = '#ccc';
-  let strokeWidth = 1.5;
-
-  if (isCurrent) {
-    fillColor = '#333';
-    strokeColor = '#fff';
-    textColor = '#fff';
-    strokeWidth = 2.5;
-  } else if (isMatched) {
-    fillColor = '#2a2a2a';
-    strokeColor = '#fff';
-    textColor = '#fff';
-    strokeWidth = 2;
-  } else if (isLCAPath) {
-    fillColor = '#222';
-    strokeColor = '#bbb';
-    textColor = '#ddd';
-    strokeWidth = 2;
-  } else if (isVisited) {
-    fillColor = '#222';
-    strokeColor = '#888';
-    textColor = '#aaa';
-    strokeWidth = 1.5;
-  }
 
   let displayText = tag;
   if (isTextNode) {
     displayText =
-      textContent.length > 20
-        ? textContent.substring(0, 20) + '...'
-        : textContent;
+      textContent.length > 20 ? textContent.substring(0, 20) + '…' : textContent;
+  } else {
+    displayText = tag.length > 14 ? tag.substring(0, 12) + '…' : tag;
   }
 
-  const htmlId = nodeDatum.attributes?.id || '';
-  const htmlClass = nodeDatum.attributes?.class || '';
-  let subtitle = '';
-  if (htmlId && htmlId !== String(nodeId)) subtitle += `#${htmlId}`;
-  if (htmlClass) {
-    const firstClass = htmlClass.split(' ')[0];
-    subtitle += subtitle ? ` .${firstClass}` : `.${firstClass}`;
-  }
-  if (subtitle.length > 22) subtitle = subtitle.substring(0, 22) + '...';
+  const label = isTextNode ? `"${displayText}"` : `<${displayText}>`;
 
-  const nodeWidth = 140;
-  const nodeHeight = subtitle ? 44 : 34;
+let circleColor = '#3a3a3a';
+  let circleBorder = '#666';
+  let textColor = '#ffffff';
+  let opacity = 0.55;
+
+  if (isCurrent) {
+    circleColor = '#a855f7';
+    circleBorder = '#c084fc';
+    textColor = '#e9d5ff';
+    opacity = 1;
+  } else if (isMatched) {
+    circleColor = '#22c55e';
+    circleBorder = '#4ade80';
+    textColor = '#bbf7d0';
+    opacity = 1;
+  } else if (isLCAPath) {
+    circleColor = '#f59e0b';
+    circleBorder = '#fcd34d';
+    textColor = '#fef3c7';
+    opacity = 1;
+  } else if (isVisited) {
+    circleColor = '#3b82f6';
+    circleBorder = '#60a5fa';
+    textColor = '#bfdbfe';
+    opacity = 1;
+  }
 
   return (
-    <g onClick={onClick} style={{ cursor: 'pointer' }}>
-      {isCurrent && (
-        <rect
-          x={-nodeWidth / 2 - 2}
-          y={-nodeHeight / 2 - 2}
-          width={nodeWidth + 4}
-          height={nodeHeight + 4}
-          rx={8}
-          fill="none"
-          stroke="#fff"
-          strokeWidth={1}
-          opacity={0.4}
-        />
-      )}
+    <g onClick={onClick} style={{ cursor: 'pointer', opacity }}>
+      
+      <circle r={8} fill={circleColor} stroke={circleBorder} strokeWidth={1.5} />
 
-      <rect
-        x={-nodeWidth / 2}
-        y={-nodeHeight / 2}
-        width={nodeWidth}
-        height={nodeHeight}
-        rx={6}
-        fill={fillColor}
-        stroke={strokeColor}
-        strokeWidth={strokeWidth}
-      />
-
-      <text
-        fill={textColor}
-        fontSize={isTextNode ? 10 : 12}
-        fontWeight={600}
-        fontFamily="'JetBrains Mono', 'Courier New', monospace"
-        textAnchor="middle"
-        dy={subtitle ? '-0.15em' : '0.35em'}
-      >
-        {isTextNode ? `"${displayText}"` : `<${displayText}>`}
-      </text>
-
-      {subtitle && !isTextNode && (
-        <text
-          fill={isVisited || isMatched || isCurrent ? '#999' : '#666'}
-          fontSize={9}
-          fontFamily="'JetBrains Mono', monospace"
-          textAnchor="middle"
-          dy="1.3em"
+<foreignObject x={14} y={-11} width={160} height={22}>
+        <div
+          style={{
+            color: textColor,
+            fontSize: '13px',
+            fontWeight: 600,
+            fontFamily: "'JetBrains Mono', 'Courier New', monospace",
+            whiteSpace: 'nowrap',
+            lineHeight: '22px',
+            userSelect: 'none',
+          }}
         >
-          {subtitle}
-        </text>
-      )}
-
-      <circle
-        cx={nodeWidth / 2 - 2}
-        cy={-nodeHeight / 2 + 2}
-        r={8}
-        fill="#0a0a0a"
-        stroke={strokeColor}
-        strokeWidth={1}
-      />
-      <text
-        x={nodeWidth / 2 - 2}
-        y={-nodeHeight / 2 + 2}
-        fill="#888"
-        fontSize={7}
-        fontWeight={700}
-        textAnchor="middle"
-        dominantBaseline="central"
-        fontFamily="'JetBrains Mono', monospace"
-      >
-        {nodeId}
-      </text>
+          {label}
+        </div>
+      </foreignObject>
     </g>
   );
 }

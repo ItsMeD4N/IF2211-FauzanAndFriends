@@ -20,12 +20,12 @@ type ParseRequest struct {
 
 type SearchRequest struct {
 	Source    string `json:"source"`
-	URL      string `json:"url"`
-	HTML     string `json:"html"`
-	Selector string `json:"selector"`
+	URL       string `json:"url"`
+	HTML      string `json:"html"`
+	Selector  string `json:"selector"`
 	Algorithm string `json:"algorithm"`
-	Limit    int    `json:"limit"`
-	Parallel bool   `json:"parallel"`
+	Limit     int    `json:"limit"`
+	Parallel  bool   `json:"parallel"`
 }
 
 type LCARequest struct {
