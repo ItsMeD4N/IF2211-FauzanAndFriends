@@ -41,7 +41,6 @@ async function generateComponents() {
   }
   const components = await Promise.all(promises);
 
-  // return a cleanup function
   const cleanup = () => {
     for (const component of components) {
       removeGeneratedComponent(component.path, component.name);
@@ -66,7 +65,6 @@ async function generateSlices() {
     slices.push(slice);
   }
 
-  // return a cleanup function
   const cleanup = () => {
     restoreBackupFile(rootStatePath);
 
@@ -78,9 +76,6 @@ async function generateSlices() {
   return [cleanup];
 }
 
-/**
- * Run
- */
 (async function () {
   const componentCleanup = await generateComponents().catch(reason => {
     reportErrors(reason);
@@ -91,7 +86,6 @@ async function generateSlices() {
     return [];
   });
 
-  // Run lint when all the components are generated to see if they have any linting erros
   const lintingResult = await runLinting()
     .then(reportSuccess(`Linting test passed`))
     .catch(reason => {
@@ -107,7 +101,7 @@ async function generateSlices() {
     });
 
   const cleanups = [...componentCleanup, ...slicesCleanup];
-  // Everything is done, so run the cleanups synchronously
+
   for (const cleanup of cleanups) {
     if (typeof cleanup === 'function') {
       cleanup();
@@ -124,7 +118,7 @@ function runLinting() {
     shell.exec(
       `yarn run lint`,
       {
-        silent: false, // so that we can see the errors in the console
+        silent: false,
       },
       code => (code ? reject(new Error(`Linting failed!`)) : resolve()),
     );
@@ -136,7 +130,7 @@ function checkTypescript() {
     shell.exec(
       `yarn run checkTs`,
       {
-        silent: false, // so that we can see the errors in the console
+        silent: false,
       },
       code => (code ? reject(new Error(`Typescript failed!`)) : resolve()),
     );

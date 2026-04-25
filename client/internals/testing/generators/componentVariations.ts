@@ -7,7 +7,6 @@ const containerNameBase = `GeneratorTestingComponent`;
 export const componentVariations = (): ComponentVariationType => {
   const variations: ComponentVariationType = [];
 
-  // Test all the component generator options against each other
   const allCombinations = permuatateBooleans(5);
   for (let i = 0; i < allCombinations.length; i++) {
     const values = allCombinations[i];
@@ -43,7 +42,6 @@ export const componentVariations = (): ComponentVariationType => {
   return variations;
 };
 
-// Create  true, false permutation of a length in an array form
 export function permuatateBooleans(length: number) {
   const array: boolean[][] = [];
   for (let i = 0; i < 1 << length; i++) {

@@ -1,13 +1,9 @@
 package selector
 
-import (
-	"strings"
-)
-
 type CombinatorType int
 
 const (
-	CombDescendant      CombinatorType = iota
+	CombDescendant CombinatorType = iota
 	CombChild
 	CombAdjacentSibling
 	CombGeneralSibling
@@ -25,7 +21,8 @@ type SelectorChain struct {
 }
 
 func ParseSelector(input string) SelectorChain {
-	input = strings.TrimSpace(input)
+
+	input = trimSpace(input)
 	if input == "" {
 		return SelectorChain{}
 	}
@@ -62,7 +59,7 @@ func ParseSelector(input string) SelectorChain {
 type selectorTokenType int
 
 const (
-	selectorToken   selectorTokenType = iota
+	selectorToken selectorTokenType = iota
 	combinatorToken
 )
 
@@ -77,15 +74,18 @@ func tokenizeSelector(input string) []sToken {
 	i := 0
 
 	for i < len(runes) {
+
 		if runes[i] == ' ' || runes[i] == '\t' {
 			j := i
 			for j < len(runes) && (runes[j] == ' ' || runes[j] == '\t') {
 				j++
 			}
+
 			if j < len(runes) && (runes[j] == '>' || runes[j] == '+' || runes[j] == '~') {
 				i = j
 				continue
 			}
+
 			if len(tokens) > 0 && tokens[len(tokens)-1].typ == selectorToken && j < len(runes) {
 				i = j
 				continue
@@ -97,6 +97,7 @@ func tokenizeSelector(input string) []sToken {
 		if runes[i] == '>' || runes[i] == '+' || runes[i] == '~' {
 			tokens = append(tokens, sToken{typ: combinatorToken, value: string(runes[i])})
 			i++
+
 			for i < len(runes) && (runes[i] == ' ' || runes[i] == '\t') {
 				i++
 			}
@@ -104,11 +105,21 @@ func tokenizeSelector(input string) []sToken {
 		}
 
 		start := i
-		for i < len(runes) && runes[i] != ' ' && runes[i] != '\t' && runes[i] != '>' && runes[i] != '+' && runes[i] != '~' {
+		for i < len(runes) &&
+			runes[i] != ' ' && runes[i] != '\t' &&
+			runes[i] != '>' && runes[i] != '+' && runes[i] != '~' &&
+			runes[i] != ':' {
 			i++
 		}
 		if i > start {
 			tokens = append(tokens, sToken{typ: selectorToken, value: string(runes[start:i])})
+		}
+
+		if i < len(runes) && runes[i] == ':' {
+			for i < len(runes) && runes[i] != ' ' && runes[i] != '\t' &&
+				runes[i] != '>' && runes[i] != '+' && runes[i] != '~' {
+				i++
+			}
 		}
 	}
 
@@ -125,13 +136,16 @@ func parseSimpleSelector(s string) SimpleSelector {
 		for i < len(runes) && runes[i] != '.' && runes[i] != '#' {
 			i++
 		}
-		sel.Tag = strings.ToLower(string(runes[start:i]))
+
+		sel.Tag = toLowerStr(string(runes[start:i]))
 	} else if i < len(runes) && runes[i] == '*' {
+
 		i++
 	}
 
 	for i < len(runes) {
 		if runes[i] == '#' {
+
 			i++
 			start := i
 			for i < len(runes) && runes[i] != '.' && runes[i] != '#' {
@@ -139,6 +153,7 @@ func parseSimpleSelector(s string) SimpleSelector {
 			}
 			sel.ID = string(runes[start:i])
 		} else if runes[i] == '.' {
+
 			i++
 			start := i
 			for i < len(runes) && runes[i] != '.' && runes[i] != '#' {
@@ -174,29 +189,52 @@ func (sc SelectorChain) String() string {
 		return ""
 	}
 
-	var sb strings.Builder
+	var result []rune
 	for i, part := range sc.Parts {
 		if i > 0 {
 			switch sc.Combinators[i-1] {
 			case CombDescendant:
-				sb.WriteString(" ")
+				result = append(result, ' ')
 			case CombChild:
-				sb.WriteString(" > ")
+				result = append(result, []rune(" > ")...)
 			case CombAdjacentSibling:
-				sb.WriteString(" + ")
+				result = append(result, []rune(" + ")...)
 			case CombGeneralSibling:
-				sb.WriteString(" ~ ")
+				result = append(result, []rune(" ~ ")...)
 			}
 		}
-		if part.Tag != "" {
-			sb.WriteString(part.Tag)
-		}
+		result = append(result, []rune(part.Tag)...)
 		if part.ID != "" {
-			sb.WriteString("#" + part.ID)
+			result = append(result, '#')
+			result = append(result, []rune(part.ID)...)
 		}
 		for _, cls := range part.Classes {
-			sb.WriteString("." + cls)
+			result = append(result, '.')
+			result = append(result, []rune(cls)...)
 		}
 	}
-	return sb.String()
+	return string(result)
+}
+
+func trimSpace(s string) string {
+	runes := []rune(s)
+	start := 0
+	end := len(runes)
+	for start < end && (runes[start] == ' ' || runes[start] == '\t') {
+		start++
+	}
+	for end > start && (runes[end-1] == ' ' || runes[end-1] == '\t') {
+		end--
+	}
+	return string(runes[start:end])
+}
+
+func toLowerStr(s string) string {
+	runes := []rune(s)
+	for i, ch := range runes {
+		if ch >= 'A' && ch <= 'Z' {
+			runes[i] = ch + 32
+		}
+	}
+	return string(runes)
 }

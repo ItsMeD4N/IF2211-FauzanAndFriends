@@ -1,4 +1,10 @@
-import React, { useMemo, useCallback } from 'react';
+import React, {
+  useMemo,
+  useCallback,
+  useRef,
+  useState,
+  useEffect,
+} from 'react';
 import Tree from 'react-d3-tree';
 import styled from 'styled-components/macro';
 import { TreeNode } from 'types/tree';
@@ -14,20 +20,16 @@ interface TreeVisualizerProps {
   totalNodes: number;
   onNodeClick?: (nodeId: number) => void;
 }
-                 
+
 function convertToD3Tree(node: TreeNode): any {
   return {
-    name: node.name || node.tag,
-    attributes: {
-      id: String(node.id),
-      tag: node.tag,
-      depth: String(node.depth),
-      ...(node.attributes || {}),
-    },
+    name: '',
+    attributes: {},
     __nodeId: node.id,
     __tag: node.tag,
     __depth: node.depth,
     __textContent: node.textContent || '',
+    __htmlAttributes: node.attributes || {},
     children: node.children
       ? node.children.map(child => convertToD3Tree(child))
       : undefined,
@@ -48,6 +50,22 @@ export function TreeVisualizer({
     if (!tree) return null;
     return convertToD3Tree(tree);
   }, [tree]);
+
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const [translate, setTranslate] = useState({ x: 400, y: 50 });
+
+  useEffect(() => {
+    const updateTranslate = () => {
+      if (wrapperRef.current) {
+        const { width } = wrapperRef.current.getBoundingClientRect();
+        setTranslate({ x: width / 2, y: 50 });
+      }
+    };
+    updateTranslate();
+    const ro = new ResizeObserver(updateTranslate);
+    if (wrapperRef.current) ro.observe(wrapperRef.current);
+    return () => ro.disconnect();
+  }, []);
 
   const renderCustomNode = useCallback(
     ({ nodeDatum, toggleNode }: any) => {
@@ -73,13 +91,15 @@ export function TreeVisualizer({
     return (
       <EmptyState>
         <EmptyTitle>Belum ada data</EmptyTitle>
-        <EmptyText>Masukkan HTML dan jalankan traversal untuk melihat pohon DOM</EmptyText>
+        <EmptyText>
+          Masukkan HTML dan jalankan traversal untuk melihat pohon DOM
+        </EmptyText>
       </EmptyState>
     );
   }
 
   return (
-    <Container>
+    <Container id="dom-tree-viz">
       <StatsBar>
         <Stat>
           Total: <b>{totalNodes}</b> node
@@ -88,16 +108,19 @@ export function TreeVisualizer({
           Max Depth: <b>{maxDepth}</b>
         </Stat>
         <Legend>
-          <LegendItem border="#888">Visited</LegendItem>
-          <LegendItem border="#fff">Matched</LegendItem>
+          <LegendItem color="#aaaaaa">Default</LegendItem>
+          <LegendItem color="#3b82f6">Visited</LegendItem>
+          <LegendItem color="#22c55e">Matched</LegendItem>
+          <LegendItem color="#f59e0b">LCA Path</LegendItem>
+          <LegendItem color="#a855f7">Current</LegendItem>
         </Legend>
       </StatsBar>
-      <TreeWrapper>
+      <TreeWrapper ref={wrapperRef}>
         <Tree
           data={d3Tree}
           orientation="vertical"
           pathFunc="step"
-          translate={{ x: 400, y: 50 }}
+          translate={translate}
           separation={{ siblings: 1.5, nonSiblings: 2 }}
           nodeSize={{ x: 180, y: 90 }}
           renderCustomNodeElement={renderCustomNode}
@@ -145,20 +168,20 @@ const Legend = styled.div`
   margin-left: auto;
 `;
 
-const LegendItem = styled.span<{ border: string }>`
+const LegendItem = styled.span<{ color: string }>`
   display: flex;
   align-items: center;
   gap: 5px;
   font-size: 0.72rem;
-  color: #888;
+  color: ${p => p.color};
 
   &::before {
     content: '';
     width: 10px;
     height: 10px;
     border-radius: 2px;
-    border: 1.5px solid ${p => p.border};
-    background: transparent;
+    border: 1.5px solid ${p => p.color};
+    background: ${p => p.color}22;
   }
 `;
 
@@ -171,6 +194,7 @@ const TreeWrapper = styled.div`
   .tree-link {
     stroke: #333 !important;
     stroke-width: 1px !important;
+    opacity: 0.7;
   }
 `;
 

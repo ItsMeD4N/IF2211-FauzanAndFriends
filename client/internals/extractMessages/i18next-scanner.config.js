@@ -28,8 +28,8 @@ module.exports = {
       jsonIndent: 2,
       lineEnding: '\n',
     },
-    keySeparator: '.', // char to separate keys
-    nsSeparator: ':', // char to split namespace from key
+    keySeparator: '.',
+    nsSeparator: ':',
     interpolation: {
       prefix: '{{',
       suffix: '}}',

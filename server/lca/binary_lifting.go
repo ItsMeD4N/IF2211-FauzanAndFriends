@@ -14,11 +14,11 @@ type LCAProcessor struct {
 }
 
 type LCAResult struct {
-	LCANodeID     int   `json:"lcaNodeId"`
+	LCANodeID     int    `json:"lcaNodeId"`
 	LCATag        string `json:"lcaTag"`
-	LCADepth      int   `json:"lcaDepth"`
-	PathFromNode1 []int `json:"pathFromNode1"`
-	PathFromNode2 []int `json:"pathFromNode2"`
+	LCADepth      int    `json:"lcaDepth"`
+	PathFromNode1 []int  `json:"pathFromNode1"`
+	PathFromNode2 []int  `json:"pathFromNode2"`
 }
 
 func NewLCAProcessor(root *model.Node) *LCAProcessor {

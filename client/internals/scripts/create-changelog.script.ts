@@ -16,7 +16,6 @@ export function createChangeLog(opts: Options = {}) {
     },
   );
 
-  // Revert the bumbped version
   shell.exec(`git checkout -- package-lock.json`, { silent: true });
   shell.exec(`git checkout -- package.json`, { silent: true });
 }

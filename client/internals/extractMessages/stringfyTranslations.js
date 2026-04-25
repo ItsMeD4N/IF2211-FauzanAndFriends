@@ -1,16 +1,3 @@
-/**
- * This is custom intermediate function to convert translations objects to i18next resource strings
- * `i18next-scanner expects strings such like:
- *
- * <A>{t('a.b')}</A>
- *
- * but translations object enables us to write the same thing as:
- *
- * <A>{t(translations.a.b)}</A>
- *
- * So, this function converts them into strings like the first one so that scanner recognizes
- */
-
 function stringfyTranslationObjects(content) {
   let contentWithObjectsStringified = content;
   const pattern = /_t\((.+?)[),]/gim;

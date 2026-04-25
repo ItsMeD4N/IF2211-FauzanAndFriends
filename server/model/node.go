@@ -1,9 +1,5 @@
 package model
 
-import (
-	"strings"
-)
-
 type Node struct {
 	ID          int               `json:"id"`
 	Tag         string            `json:"tag"`
@@ -19,12 +15,21 @@ func (n *Node) Classes() []string {
 	if !ok || cls == "" {
 		return nil
 	}
-	parts := strings.Fields(cls)
-	result := make([]string, 0, len(parts))
-	for _, p := range parts {
-		if p != "" {
-			result = append(result, p)
+	runes := []rune(cls)
+	var result []string
+	var current []rune
+	for _, ch := range runes {
+		if ch == ' ' || ch == '\t' {
+			if len(current) > 0 {
+				result = append(result, string(current))
+				current = current[:0]
+			}
+		} else {
+			current = append(current, ch)
 		}
+	}
+	if len(current) > 0 {
+		result = append(result, string(current))
 	}
 	return result
 }
@@ -43,17 +48,17 @@ func (n *Node) HasClass(class string) bool {
 }
 
 func (n *Node) GetPath() string {
-	parts := []string{}
+	var parts []string
 	current := n
 	for current != nil {
 		label := current.Tag
 		if id := current.GetID(); id != "" {
-			label += "#" + id
+			label = label + "#" + id
 		}
 		parts = append([]string{label}, parts...)
 		current = current.Parent
 	}
-	return strings.Join(parts, " > ")
+	return joinStrings(parts, " > ")
 }
 
 func MaxDepth(root *Node) int {
@@ -123,10 +128,11 @@ func (n *Node) ToJSON() *NodeJSON {
 
 	label := n.Tag
 	if id := n.GetID(); id != "" {
-		label += "#" + id
+		label = label + "#" + id
 	}
 	if classes := n.Classes(); len(classes) > 0 {
-		label += "." + strings.Join(classes, ".")
+		clsJoined := joinStrings(classes, ".")
+		label = label + "." + clsJoined
 	}
 
 	result := &NodeJSON{
@@ -199,4 +205,19 @@ func (n *Node) NextSibling() *Node {
 		}
 	}
 	return nil
+}
+
+func joinStrings(parts []string, sep string) string {
+	if len(parts) == 0 {
+		return ""
+	}
+	var result []rune
+	sepRunes := []rune(sep)
+	for i, p := range parts {
+		if i > 0 {
+			result = append(result, sepRunes...)
+		}
+		result = append(result, []rune(p)...)
+	}
+	return string(result)
 }

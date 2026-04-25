@@ -26,7 +26,7 @@ export const HomePage = lazyLoad(
   module => module.HomePage,
   {
     fallback: <div>Loading...</div>,
-  }
+  },
 );
 ```
 

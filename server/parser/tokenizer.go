@@ -100,7 +100,10 @@ var voidElements = map[string]bool{
 }
 
 var skipElements = map[string]bool{
-	"script": true, "style": true, "noscript": true,
+	"script":   true,
+	"style":    true,
+	"noscript": true,
+	"head":     true,
 }
 
 func (t *Tokenizer) Tokenize() []Token {
@@ -108,6 +111,7 @@ func (t *Tokenizer) Tokenize() []Token {
 	for !t.eof() {
 		if t.peek() == '<' {
 			token := t.readTag()
+
 			if token.Type != TokenComment && token.Type != TokenDoctype {
 				tokens = append(tokens, token)
 			}
@@ -235,13 +239,14 @@ func (t *Tokenizer) readAttributes() map[string]string {
 
 	for {
 		t.skipWhitespace()
+
 		if t.eof() || t.peek() == '>' || t.peek() == '/' {
 			break
 		}
 
 		attrName := t.readAttrName()
 		if attrName == "" {
-			t.next()
+			t.next() 
 			continue
 		}
 		attrName = toLowerString(attrName)
@@ -249,11 +254,12 @@ func (t *Tokenizer) readAttributes() map[string]string {
 		t.skipWhitespace()
 
 		if t.peek() == '=' {
-			t.next()
+			t.next() 
 			t.skipWhitespace()
 			attrValue := t.readAttrValue()
 			attrs[attrName] = attrValue
 		} else {
+			
 			attrs[attrName] = ""
 		}
 	}
@@ -320,14 +326,16 @@ func (t *Tokenizer) skipUntilClosingTag(tagName string) {
 	target := "</" + tagName
 	for !t.eof() {
 		if t.peek() == '<' {
+			
 			remaining := string(t.input[t.pos:])
 			if len(remaining) >= len(target) && toLowerString(remaining[:len(target)]) == target {
-				t.pos += len(target)
+				t.pos += len(target) 
+				
 				for !t.eof() && t.peek() != '>' {
 					t.next()
 				}
 				if !t.eof() {
-					t.next()
+					t.next() 
 				}
 				return
 			}

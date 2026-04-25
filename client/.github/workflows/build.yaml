@@ -14,14 +14,14 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 16.x
-      - run: yarn add shelljs 
+      - run: yarn add shelljs
       - run: yarn run create:npm-package
       - name: Upload template
         uses: actions/upload-artifact@v1
         with:
           name: cra-template-rb
           path: .cra-template-rb
-  
+
   createAndTestCRA:
     needs: createNpmPackage
     runs-on: ubuntu-latest

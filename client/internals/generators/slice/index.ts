@@ -1,7 +1,3 @@
-/**
- * Container Generator
- */
-
 import { Actions, PlopGeneratorConfig } from 'node-plop';
 import path from 'path';
 import inquirer from 'inquirer';

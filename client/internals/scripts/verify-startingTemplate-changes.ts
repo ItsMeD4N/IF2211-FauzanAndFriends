@@ -3,9 +3,6 @@ import fs from 'fs';
 
 interface Options {}
 
-/*
- * Check if the changed files are also updated if they are in the startingTemplate
- */
 export function verifyStartingTemplateChanges(opts: Options = {}) {
   const gitDiff = shell.exec(`git diff --staged --name-only`, { silent: true });
   const changedFiles = gitDiff.stdout.split('\n');
