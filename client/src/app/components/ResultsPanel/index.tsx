@@ -57,7 +57,7 @@ export function ResultsPanel({
                 <Th>Tag</Th>
                 <Th>Attributes</Th>
                 <Th>Depth</Th>
-                <Th>Path</Th>
+                <Th style={{ minWidth: '300px' }}>Path</Th>
               </tr>
             </thead>
             <tbody>
@@ -227,11 +227,12 @@ const AttrBadge = styled.span`
   font-family: 'JetBrains Mono', monospace;
 `;
 
-const PathText = styled.span`
-  color: #666;
+const PathText = styled.div`
+  color: #999;
   font-family: 'JetBrains Mono', monospace;
-  font-size: 0.72rem;
-  word-break: break-all;
+  font-size: 0.75rem;
+  word-break: break-word;
+  line-height: 1.4;
 `;
 
 const EmptyResult = styled.div`
